@@ -1,8 +1,46 @@
 version: 2
 jobs:
-  build:
+  plan:
     docker:
-      - image: circleci/ruby:2.4.1
+      - image: hashicorp/terraform:0.11.11
     steps:
       - checkout
-      - run: echo "A first hello"
+      - run:
+          name: Terraform plan
+          command: |
+            cd terraform
+            terraform init
+            terraform plan -out plan.tfplan
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  apply:
+    docker:
+      - image: hashicorp/terraform:0.11.11
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Terraform apply
+          command: |
+            cd terraform
+            terraform apply plan.tfplan
+workflows:
+  version: 2
+  plan_and_apply:
+    jobs:
+      - plan
+      - wait_for_approval:
+          type: approval
+          requires:
+            - plan
+          filters:
+            branches:
+              only: master
+      - apply:
+          requires:
+            - wait_for_approval
+          filters:
+            branches:
+              only: master
