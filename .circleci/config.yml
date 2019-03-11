@@ -11,6 +11,11 @@ jobs:
             cd terraform
             terraform init
             terraform plan -out plan.tfplan
+      - run:
+          name: Persist state
+          command: |
+            git add terraform.tfstate
+            git commit -m "Terrform state update" --allow-empty
       - persist_to_workspace:
           root: .
           paths:
@@ -26,6 +31,11 @@ jobs:
           command: |
             cd terraform
             terraform apply plan.tfplan
+      - run:
+          name: Persist state
+          command: |
+            git add terraform.tfstate
+            git commit -m "Terrform state update" --allow-empty
 workflows:
   version: 2
   plan_and_apply:
