@@ -26,14 +26,7 @@ jobs:
           command: |
             cd terraform
             terraform apply plan.tfplan
-      - run:
-          name: Persist state
-          command: |
-            git config user.email "circleci@dave-thompson.co.uk"
-            git config user.name "CircleCI"
-            git add terraform/terraform.tfstate
-            git commit -m "Terrform state update" --allow-empty
-            git push -q https://${GITHUB_TOKEN}@github.com/davet1985/www.dave-thompson.co.uk.git master
+
 workflows:
   version: 2
   plan_and_apply:
